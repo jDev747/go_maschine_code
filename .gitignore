@@ -5,3 +5,8 @@ tests/*
 #files
 /gmc.exe
 /go.mod
+/DEVGUIDE.md
+/instructions.gmc
+/inteructions.gmc.bak
+/binary.gmc
+/binary.gmc.bak
