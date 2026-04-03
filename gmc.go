@@ -2,9 +2,19 @@ package main //TODO: Find a good name!
 import (
 	"bytes"
 	// "fmt"
-	"log"
+	"log" 
 	"os"
 )
+func safeIndex(slice []any, index int) [2]any{
+	if index < 0 {
+		log.Fatal("PANIC: SAFEINDEX PARAM < 0 <GMC>")
+	}
+	if len(slice) < index {
+		return [2]any{0, false}
+	} else {
+		return [2]any{slice[index], true}
+	}
+} 
 func GetInstructions(path string) [][]byte {
 	bytesoriginal, err := os.ReadFile(path)
 	if err != nil {
