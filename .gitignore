@@ -1,0 +1,7 @@
+#folders
+tests/*
+
+
+#files
+/gmc.exe
+/go.mod
