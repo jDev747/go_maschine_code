@@ -5,23 +5,22 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"strings"
 )
 
 var OPTION_AUTOCLEAR_ARG = false
-/*
-func safeIndex[T any | int](slice []T, index int) (T, error) {
-	if index < 0 {
-		log.Fatal("PANIC: SAFEINDEX PARAM < 0 <GMC>")
-	}
-	if len(slice) < index + 1 {
-		return 0, errors.New("error: not safe indexing")
-	} else {
-		return slice[index], nil
-	}
-}
-	*/
+var STACK_ARG []any
+var STACK_PERSONAL []any
+var DECODER string = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!?.()[]{}_&%$'\"/\\@<>|+-*~#=" // add nmore charaters
+
 func intToBin(int_ int) string {
 	return strconv.FormatInt(int64(int_), 2)
+}
+func ReadStackArg(index int) any{
+	if len(STACK_ARG) < index + 1 {
+		log.Fatal("PANIC: INVALID STACK [STACK ARG] <GMC> MissingParamInStack")
+	}
+	return STACK_ARG[index]
 }
 func GetInstructions(path string) [][]byte {
 	bytesoriginal, err := os.ReadFile(path)
@@ -39,39 +38,68 @@ func GetInstructions(path string) [][]byte {
 	return cleaned
 }
 func ReadInstruction(instruction []byte) {
-	fmt.Println(instruction)
 	itype := int(instruction[0])
 	if itype < 0xA9 {
 		log.Fatal("PANIC: INVALID INSTRUCTION <GMC>")
 	}
-	fmt.Println(itype)
 	switch itype {
 	case 0xA9:
+		fmt.Println("exit code 0")
 		os.Exit(0)
 	case 0xAA:
 		if len(instruction) < 2 {
 			log.Fatal("PANIC: INVALID INSTRUCTION [OPTION <MISSING>] <GMC>")
 		}
-		options := instruction[1] 
-		
+		options := instruction[1]
 		binoptions := intToBin(int(options))
 		if binoptions[0] == '1' {
 			OPTION_AUTOCLEAR_ARG = true
 		} //todo: add more options
 	case 0xAB:
 		if len(instruction) < 2 {
-			log.Fatal("PANIC: INVALID INSTRUCTION [PUSHSTR <MISSING> ...] <GMC>")
+			log.Fatal("PANIC: INVALID INSTRUCTION [PUSHSTR <MISSING> ...] <GMC> MissingStack")
+		}
+		if len(instruction) < 3 {
+			log.Fatal("PANIC: INVALID INSTRUCTION [PUSHSTR STACK <MISSING>] <GMC> MissingString")
 		}
 		stackany := instruction[1]
-		
+
 		stack := int(stackany)
-		if stack > 2 {
-			log.Fatal("PANIC: INVALID INSTRUCTION [PUSHSTR <TO_BIG> ...] <GMC>")
+		if stack > 1 {
+			log.Fatal("PANIC: INVALID INSTRUCTION [PUSHSTR <TO_BIG> ...] <GMC> InvalidStack: "+ fmt.Sprint(stack))
 		}
-		//TODO: Continue
+		var stringtopush strings.Builder
+		for _, byteitem := range instruction[2:] {
+			convint := int(byteitem)
+			if convint == 0xAC {
+				break
+			}
+			if convint > 88 {
+				log.Fatal("PANIC: INVALID STRING [PUSHSTR STACK <INVALID STRING>] <GMC> InvalidChar: " + fmt.Sprint(int(byteitem)))
+			}
+			stringtopush.WriteString(string(DECODER[convint]))
+		}
+		if stack == 0 {
+			STACK_ARG = append(STACK_ARG, stringtopush.String())
+		} else {
+			STACK_PERSONAL = append(STACK_PERSONAL, stringtopush.String())
+		}
+	case 0xAD:
+		if len(instruction) < 2 {
+			log.Fatal("PANIC: INVALID INSTRUCTION [CALL <MISSING>] <GMC> MissingFunction")
+		}
+		function := int(instruction[1])
+		switch function {
+		case 0x00:
+			fmt.Println(ReadStackArg(0))
+		case 0x01:
+			fmt.Print("\033[H\033[2J")
+		}
 	}
 }
 
 func main() {
-	ReadInstruction(GetInstructions("instructions.gmc")[0])
+	for _, instruction := range GetInstructions("instructions.gmc") {
+		ReadInstruction(instruction)
+	}
 }
