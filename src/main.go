@@ -13,6 +13,13 @@ var DECODER string = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ012345
 func intToBin(int_ int) string {
 	return strconv.FormatInt(int64(int_), 2)
 }
+func BinToInt(bin string) int64 {
+	val, err := strconv.ParseInt(bin, 2, 0)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return val
+}
 func GetInstructions(path string) [][]byte {
 	bytesoriginal, err := os.ReadFile(path)
 	if err != nil {
@@ -69,6 +76,8 @@ func ReadInstruction(instruction []byte) {
 		}
 	case 0xAF:
 		CommandClearStack(instruction)
+	case 0xB0:
+		CommandPushInt(instruction)
 	}
 }
 

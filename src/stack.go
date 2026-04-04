@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"strconv"
 	"strings"
 )
 var OPTION_AUTOCLEAR_ARG = false
@@ -57,4 +58,39 @@ func CommandClearStack(instruction []byte) {
 		} else {
 			STACK_PERSONAL = make([]any, 0, 5)
 		}
+}
+func CommandPushInt(instruction []byte) {
+	if len(instruction) < 2 {
+		log.Fatal("PANIC: INVALID INSTRUCTION [PUSHINT <MISSING> ...] <GMC> MissingStack")
+	}
+	if len(instruction) < 3 {
+		log.Fatal("PANIC: INVALID INSTRUCTION [PUSHINT STACK <MISSING>] <GMC> MissingInt")
+	}
+	stack := int(instruction[1])
+	if stack > 1 {
+		log.Fatal("PANIC: INVALID INSTRUCTION [PUSHINT <TO_BIG> ...] <GMC> InvalidStack: " + fmt.Sprint(stack))
+	}
+	var stringtopush strings.Builder
+	for _, byteitem := range instruction[2:] {
+		bin := intToBin(int(byteitem))
+		tensplace := BinToInt(bin[:4])
+		fmt.Fprint(&stringtopush, tensplace)
+		onesplace := BinToInt(bin[4:])
+		fmt.Fprint(&stringtopush, onesplace)
+		if tensplace > 9 {
+			log.Fatal("PANIC: INVALID INT [PUSHINT <INVALID INT>] <GMC> InvalidInt: " + fmt.Sprint(tensplace))
+		}
+		if onesplace > 9 {
+			log.Fatal("PANIC: INVALID INT [PUSHINT <INVALID INT>] <GMC> InvalidInt: " + fmt.Sprint(tensplace))
+		}
+	}
+i, err := strconv.Atoi(stringtopush.String())
+if err != nil {
+	log.Fatal(err)
+}	
+if instruction[1] == 0 {
+	STACK_ARG = append(STACK_ARG, i)
+} else {
+	STACK_PERSONAL = append(STACK_PERSONAL, i)
+}
 }
