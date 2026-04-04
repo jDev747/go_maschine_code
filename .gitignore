@@ -1,5 +1,5 @@
 #folders
-tests/*
+test/*
 
 
 #files
@@ -13,3 +13,6 @@ instructions.gmc
 instructions.gmc.bak
 binary.gmc
 binary.gmc.bak
+complier/smth.gac
+complier/smth.gmc
+complier/smth.gmc

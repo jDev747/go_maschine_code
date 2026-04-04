@@ -1,10 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
-	"strconv"
 	"strings"
 )
 
@@ -47,10 +45,7 @@ func CompileInstruction(instruction string) []byte {
 		if len(split) < 2 {
 			Raise("Missing <option>", instruction)
 		}
-		i, err := strconv.ParseInt(split[1], 16, 0)
-		if err != nil {
-			log.Fatal(err)
-		}
+		i := StrToInt(split[1], 16)
 		compiled = append(compiled, byte(0xAA), byte(i))
 	case "pushstr":
 		if len(split) < 2 {
@@ -60,33 +55,55 @@ func CompileInstruction(instruction string) []byte {
 			Raise("Missing <string>", instruction)
 		}
 
-		i, err := strconv.ParseInt(split[1], 16, 0)
-		if err != nil {
-			log.Fatal(err)
-		}
-		compiled = append(compiled, byte(0xAB), byte(i))
+		stack := StrToInt(split[1], 16)
+		compiled = append(compiled, byte(0xAB), byte(stack))
 		compiled = append(compiled, Encode(strings.Join(split[2:], " "))...)
 		compiled = append(compiled, byte(0xAC))
 	case "call":
 		if len(split) < 2 {
 			Raise("Missing <function>", instruction)
 		}
-		i, err := strconv.ParseInt(split[1], 16, 0)
-		if err != nil {
-			log.Fatal(err)
-		}
+		i := StrToInt(split[1], 16)
 		compiled = append(compiled, byte(0xAD), byte(i))
+	case "pushint":
+		if len(split) < 2 {
+			Raise("Missing <stack>", instruction)
+		}
+		if len(split) < 3 {
+			Raise("Missing <int>", instruction)
+		}
+		stack := StrToInt(split[1], 16)
+		compiled = append(compiled, byte(0xB0), byte(stack))
+		compiled = append(compiled, byte(StrToInt(split[2], 10)))
+	case "clearstack":
+		if len(split) < 2 {
+			Raise("Missing <stack>", instruction)
+		}
+		stack := StrToInt(split[1], 16)
+		compiled = append(compiled, byte(0xAF), byte(stack))
+	case "varstr":
+		if len(split) < 2 {
+			Raise("Missing <varname>", instruction)
+		}
+		if split[1][1:3] == "A8" || split[1][2:5] == "A8" {
+			Raise("Invalid: <varname> CANNOT contain byte A8", instruction)
+		}
+		compiled = append(compiled, byte(0xB1))
+		compiled = append(compiled, byte(StrToInt(split[1], 16)))
+		if len(split) > 2 {
+			compiled = append(compiled, Encode(strings.Join(split[2:], " "))...)
+		}
+	case "//":
+		//ignore: this will be a comment
 	}
 	return compiled
 }
 func main() {
-	complete := make([]byte, 0, 30)
-	for _, i := range GetInstructions("smth.gmc") {
+	var complete []byte
+	for _, i := range GetInstructions("../test/smth.gac") {
 		instruction := CompileInstruction(i)
 		complete = append(complete, instruction...)
 		complete = append(complete, byte(0xA8))
 	}
-	for _, item := range complete {
-		fmt.Println(item)
-	}
+	os.WriteFile("../test/smth.gmc", complete, 0777)
 }

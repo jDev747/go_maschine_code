@@ -76,7 +76,7 @@ func ReadInstruction(instruction []byte) {
 }
 
 func main() {
-	for _, instruction := range GetInstructions("../instructions.gmc") {
+	for _, instruction := range GetInstructions("../test/smth.gmc") {
 		ReadInstruction(instruction)
 	}
 }

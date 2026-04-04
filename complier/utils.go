@@ -15,3 +15,10 @@ func BinToInt(bin string) int64 {
 	}
 	return val
 }
+func StrToInt(str string, base int) int64 {
+	i, err := strconv.ParseInt(str, base, 64)
+		if err != nil {
+			log.Fatal(err)
+		}
+	return i
+}

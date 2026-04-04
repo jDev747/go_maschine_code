@@ -1,3 +1,0 @@
-pushstr 00 hi
-call 00
-exit
