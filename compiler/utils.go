@@ -22,3 +22,19 @@ func StrToInt(str string, base int) int64 {
 		}
 	return i
 }
+func IntToBytes(int_ int) []byte {
+	var bytes_ []byte
+	str := strconv.FormatInt(int64(int_), 10)
+	var split []string
+	curstr := []byte("00")
+	for i, char := range str {
+		curstr[i%2] = byte(char)
+		if i%2 == 0 {
+			split = append(split, string(curstr))
+		} //very wierd
+	}
+	for _, twodigits := range split {
+		bytes_ = append(bytes_, byte(StrToInt(twodigits, 10)))
+	}
+	return bytes_
+}

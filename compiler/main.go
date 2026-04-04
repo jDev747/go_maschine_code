@@ -74,7 +74,7 @@ func CompileInstruction(instruction string) []byte {
 		}
 		stack := StrToInt(split[1], 16)
 		compiled = append(compiled, byte(0xB0), byte(stack))
-		compiled = append(compiled, byte(StrToInt(split[2], 10)))
+		compiled = append(compiled, IntToBytes(int(StrToInt(split[2], 10)))...)
 	case "clearstack":
 		if len(split) < 2 {
 			Raise("Missing <stack>", instruction)
@@ -105,6 +105,19 @@ func CompileInstruction(instruction string) []byte {
 		compiled = append(compiled, byte(StrToInt(split[1], 16)))
 		compiled = append(compiled, byte(StrToInt(split[2][0:2], 16)))
 		compiled = append(compiled, byte(StrToInt(split[2][2:4], 16)))
+	case "varint":
+		if len(split) < 2 {
+			Raise("Missing <varname>", instruction)
+		}
+		if split[1][0:2] == "A8" || split[1][2:4] == "A8" {
+			Raise("Invalid: <varname> CANNOT contain byte A8", instruction)
+		}
+		compiled = append(compiled, byte(0xB3))
+		compiled = append(compiled, byte(StrToInt(split[1][0:2], 16)))
+		compiled = append(compiled, byte(StrToInt(split[1][2:4], 16)))
+		if len(split) > 2 {
+			compiled = append(compiled, IntToBytes(int(StrToInt(split[2], 10)))...)
+		}
 	case "//":
 		//ignore: this will be a comment
 	}
