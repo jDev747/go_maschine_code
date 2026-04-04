@@ -10,21 +10,21 @@ import (
 )
 
 func FuncColorPrint() {
-	pcolor := ReadStackArg(0).(string)
+	pcolor := ReadStackArg(0).(int)
 	stringtoprint := ReadStackArg(1).(string) // what
 	switch pcolor {
-	case "red":
+	case 0x00:
 		color.Red(stringtoprint)
-	case "blue":
+	case 0x01:
 		color.Blue(stringtoprint)
-	case "yellow":
+	case 0x02:
 		color.Yellow(stringtoprint)
-	case "white":
+	case 0x03:
 		color.White(stringtoprint)
-	case "cyan":
+	case 0x04:
 		color.Cyan(stringtoprint)
 	default:
-		log.Fatal("PANIC: INVALID STACK [CALL COLORPRINT] [STACK ARG]<GMC> InvalidColor: " + pcolor)
+		log.Fatal("PANIC: INVALID STACK [CALL COLORPRINT] [STACK ARG]<GMC> InvalidColor: " + string(pcolor))
 	}
 
 }

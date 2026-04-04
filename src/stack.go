@@ -72,7 +72,10 @@ func CommandPushInt(instruction []byte) {
 	}
 	var stringtopush strings.Builder
 	for _, byteitem := range instruction[2:] {
-		bin := intToBin(int(byteitem))
+		if byteitem == byte(0xAC) { //STREND / INTEND
+			break
+		}
+		bin := fmt.Sprintf("%08s", intToBin(int(byteitem)))
 		tensplace := BinToInt(bin[:4])
 		fmt.Fprint(&stringtopush, tensplace)
 		onesplace := BinToInt(bin[4:])
