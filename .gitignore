@@ -6,9 +6,9 @@ tests/*
 src/generator.py
 generator.py
 #generator.py is a script that converts a string to an array of bytes for encoding
-/gmc.exe
-/DEVGUIDE.md
-/instructions.gmc
-/instructions.gmc.bak
-/binary.gmc
-/binary.gmc.bak
+gmc.exe
+DEVGUIDE.md
+instructions.gmc
+instructions.gmc.bak
+binary.gmc
+binary.gmc.bak
