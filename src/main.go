@@ -24,7 +24,7 @@ func GetInstructions(path string) [][]byte {
 func ReadInstruction(instruction []byte) {
 	itype := int(instruction[0])
 	if itype < 0xA9 {
-		log.Fatal("PANIC: INVALID INSTRUCTION <GMC>")
+		log.Fatal("PANIC: INVALID INSTRUCTION <GMC> InvalidInstruction: " + fmt.Sprint(itype))
 	}
 	switch itype {
 	case 0xA9:
@@ -32,7 +32,7 @@ func ReadInstruction(instruction []byte) {
 		os.Exit(0)
 	case 0xAA:
 		if len(instruction) < 2 {
-			log.Fatal("PANIC: INVALID INSTRUCTION [OPTION <MISSING>] <GMC>")
+			log.Fatal("PANIC: INVALID INSTRUCTION [OPTION <MISSING>] <GMC> Missing Options")
 		}
 		options := instruction[1]
 		binoptions := IntToBin(int(options))
@@ -53,7 +53,7 @@ func ReadInstruction(instruction []byte) {
 			FuncClearScreen()
 		case 0x02:
 			FuncColorPrint()
-		
+
 		default:
 			log.Fatal("PANIC: INVALID INSTRUCTION [CALL <NOT_FOUND>] <GMC> InvalidFunction: " + fmt.Sprint(function))
 			if OPTION_AUTOCLEAR_ARG {
@@ -70,6 +70,8 @@ func ReadInstruction(instruction []byte) {
 		CommandPushVar(instruction)
 	case 0xB3:
 		CommandIntVar(instruction)
+	default:
+		log.Fatal("PANIC: INVALID INSTRUCTION <GMC> InvalidInstruction: " + fmt.Sprint(itype))
 	}
 }
 
