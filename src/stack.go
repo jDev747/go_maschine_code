@@ -77,13 +77,32 @@ func CommandPushInt(instruction []byte) {
 			log.Fatal("PANIC: INVALID INT [PUSHINT <INVALID INT>] <GMC> InvalidInt: " + fmt.Sprint(tensplace))
 		}
 	}
-i, err := strconv.Atoi(stringtopush.String())
-if err != nil {
-	log.Fatal(err)
-}	
-if instruction[1] == 0 {
-	STACK_ARG = append(STACK_ARG, i)
-} else {
-	STACK_PERSONAL = append(STACK_PERSONAL, i)
+	i, err := strconv.Atoi(stringtopush.String())
+	if err != nil {
+		log.Fatal(err)
+	}	
+	if instruction[1] == 0 {
+		STACK_ARG = append(STACK_ARG, i)
+	} else {
+		STACK_PERSONAL = append(STACK_PERSONAL, i)
+	}
 }
+func CommandPushVar(instruction []byte) {
+	if len(instruction) < 2 {
+		log.Fatal("PANIC: INVALID INSTRUCTION [PUSHVAR <MISSING> ...] <GMC> MissingStack")
+	}
+	if len(instruction) < 4 {
+		log.Fatal("PANIC: INVALID INSTRUCTION [PUSHVAR STACK <MISSING>] <GMC> MissingVar")
+	}
+	stack := int(instruction[1])
+	key := string(instruction[2:])
+	value, ok := VARS[key]
+	if !ok {
+		log.Fatal("PANIC: INVALID INSTRUCTION [PUSHVAR STACK <VAR-DOES-NOT-EXIST>]")
+	}
+	if stack == 0 {
+		STACK_ARG = append(STACK_ARG, value)
+	} else {
+		STACK_PERSONAL = append(STACK_PERSONAL, value)
+	}
 }

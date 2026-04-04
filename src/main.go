@@ -66,6 +66,8 @@ func ReadInstruction(instruction []byte) {
 		CommandPushInt(instruction)
 	case 0xB1:
 		CommandStrVar(instruction)
+	case 0xB2:
+		CommandPushVar(instruction)
 	}
 }
 
