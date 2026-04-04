@@ -4,36 +4,14 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"os/exec"
-	"runtime"
 	"strconv"
-	"strings"
 )
 
-var OPTION_AUTOCLEAR_ARG = false
-var STACK_ARG []any
-var STACK_PERSONAL []any
+
 var DECODER string = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!?.()[]{}_&%$'\"/\\@<>|+-*~#= \n\t" // add nmore charaters
-func clearScreen() {
-	var cmd *exec.Cmd
-	switch runtime.GOOS {
-	case "windows":
-		cmd = exec.Command("cmd", "/c", "cls")
-	default: // stuff thatis not windows
-		cmd = exec.Command("clear")
-	}
-	cmd.Stdout = os.Stdout
-	cmd.Run()
-	// Does not work in vscode terminal btw
-}
+
 func intToBin(int_ int) string {
 	return strconv.FormatInt(int64(int_), 2)
-}
-func ReadStackArg(index int) any {
-	if len(STACK_ARG) < index+1 {
-		log.Fatal("PANIC: INVALID STACK [STACK ARG] <GMC> MissingParamInStack")
-	}
-	return STACK_ARG[index]
 }
 func GetInstructions(path string) [][]byte {
 	bytesoriginal, err := os.ReadFile(path)
@@ -69,34 +47,7 @@ func ReadInstruction(instruction []byte) {
 			OPTION_AUTOCLEAR_ARG = true
 		} //todo: add more options
 	case 0xAB:
-		if len(instruction) < 2 {
-			log.Fatal("PANIC: INVALID INSTRUCTION [PUSHSTR <MISSING> ...] <GMC> MissingStack")
-		}
-		if len(instruction) < 3 {
-			log.Fatal("PANIC: INVALID INSTRUCTION [PUSHSTR STACK <MISSING>] <GMC> MissingString")
-		}
-		stackany := instruction[1]
-
-		stack := int(stackany)
-		if stack > 1 {
-			log.Fatal("PANIC: INVALID INSTRUCTION [PUSHSTR <TO_BIG> ...] <GMC> InvalidStack: " + fmt.Sprint(stack))
-		}
-		var stringtopush strings.Builder
-		for _, byteitem := range instruction[2:] {
-			convint := int(byteitem)
-			if convint == 0xAC {
-				break
-			}
-			if convint > len(DECODER)-1 {
-				log.Fatal("PANIC: INVALID STRING [PUSHSTR STACK <INVALID STRING>] <GMC> InvalidChar: " + fmt.Sprint(int(byteitem)))
-			}
-			stringtopush.WriteString(string(DECODER[convint]))
-		}
-		if stack == 0 {
-			STACK_ARG = append(STACK_ARG, stringtopush.String())
-		} else {
-			STACK_PERSONAL = append(STACK_PERSONAL, stringtopush.String())
-		}
+		CommandPushStr(instruction)
 	case 0xAD:
 		if len(instruction) < 2 {
 			log.Fatal("PANIC: INVALID INSTRUCTION [CALL <MISSING>] <GMC> MissingFunction")
@@ -106,7 +57,7 @@ func ReadInstruction(instruction []byte) {
 		case 0x00:
 			fmt.Println(ReadStackArg(0))
 		case 0x01:
-			clearScreen()
+			FuncClearScreen()
 		case 0x02:
 			FuncColorPrint()
 		
@@ -117,14 +68,7 @@ func ReadInstruction(instruction []byte) {
 			}
 		}
 	case 0xAF:
-		if len(instruction) < 2 {
-			log.Fatal("PANIC: INVALID INSTRUCTION [CLEARSTACK <MISSING>] <GMC> MissingStack")
-		}
-		stack := instruction[1]
-		if stack > 1 {
-			log.Fatal("PANIC: INVALID INSTRUCTION [PUSHSTR <TO_BIG> ...] <GMC> InvalidStack: " + fmt.Sprint(stack))
-		}
-		//Todo: Continue
+		CommandClearStack(instruction)
 	}
 }
 

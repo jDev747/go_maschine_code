@@ -3,6 +3,8 @@ tests/*
 
 
 #files
+src/generator.py
+#generator.py is a script that converts a string to an array of bytes for encoding
 /gmc.exe
 /DEVGUIDE.md
 /instructions.gmc
