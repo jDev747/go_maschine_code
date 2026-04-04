@@ -8,8 +8,6 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
-
-	"github.com/fatih/color"
 )
 
 var OPTION_AUTOCLEAR_ARG = false
@@ -89,7 +87,7 @@ func ReadInstruction(instruction []byte) {
 			if convint == 0xAC {
 				break
 			}
-			if convint > len(DECODER) - 1 {
+			if convint > len(DECODER)-1 {
 				log.Fatal("PANIC: INVALID STRING [PUSHSTR STACK <INVALID STRING>] <GMC> InvalidChar: " + fmt.Sprint(int(byteitem)))
 			}
 			stringtopush.WriteString(string(DECODER[convint]))
@@ -110,27 +108,13 @@ func ReadInstruction(instruction []byte) {
 		case 0x01:
 			clearScreen()
 		case 0x02:
-			pcolor := ReadStackArg(0).(string)
-			stringtoprint := ReadStackArg(1).(string) // what
-			switch pcolor {
-			case "red":
-				color.Red(stringtoprint)
-			case "blue":
-				color.Blue(stringtoprint)
-			case "yellow":
-				color.Yellow(stringtoprint)
-			case "white":
-				color.White(stringtoprint)
-			case "cyan":
-				color.Cyan(stringtoprint)
-			default:
-				log.Fatal("PANIC: INVALID STACK [CALL COLORPRINT] [STACK ARG]<GMC> InvalidColor: " + pcolor)
-			}
+			FuncColorPrint()
+		
 		default:
-			log.Fatal("PANIC: INVALID INSTRUCTION [CALL <NOT_FOUND>] <GMC> InvalidFunction: "+ fmt.Sprint(function))
-		}
-		if OPTION_AUTOCLEAR_ARG {
-			STACK_ARG = make([]any, 0, 6)
+			log.Fatal("PANIC: INVALID INSTRUCTION [CALL <NOT_FOUND>] <GMC> InvalidFunction: " + fmt.Sprint(function))
+			if OPTION_AUTOCLEAR_ARG {
+				STACK_ARG = make([]any, 0, 6)
+			}
 		}
 	case 0xAF:
 		if len(instruction) < 2 {
@@ -145,7 +129,7 @@ func ReadInstruction(instruction []byte) {
 }
 
 func main() {
-	for _, instruction := range GetInstructions("instructions.gmc") {
+	for _, instruction := range GetInstructions("../instructions.gmc") {
 		ReadInstruction(instruction)
 	}
 }
