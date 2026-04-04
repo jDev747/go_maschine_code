@@ -15,3 +15,14 @@ func CommandStrVar(instruction []byte) {
 	}
 	VARS[key] = ParseString(instruction[3:])
 }
+func CommandIntVar(instruction []byte) {
+	if len(instruction) < 3 { 
+		log.Fatal("PANIC: INVALID INSTRUCTION [VARINT <MISSING> ...]  <GMC> MissingVarName")
+	}
+	 key := string(instruction[1:3])
+	if len(instruction) == 3 {
+		VARS[key] = nil
+		return
+	}
+	VARS[key] = ParseInt(instruction[3:])
+}

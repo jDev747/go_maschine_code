@@ -22,7 +22,7 @@ func ParseString(bytearr []byte) string{
 	var stringtopush strings.Builder
 	for _, byteitem := range bytearr {
 		convint := int(byteitem)
-		if convint == 0xAC {
+		if convint == 0xAC { //STREND / INTEND
 			break
 		}
 		if convint > len(DECODER)-1 {
@@ -31,4 +31,28 @@ func ParseString(bytearr []byte) string{
 		stringtopush.WriteString(string(DECODER[convint]))
 	}
 	return stringtopush.String()
+}
+func ParseInt(bytearr []byte) int{					//this is wierd
+var stringtopush strings.Builder
+	for _, byteitem := range bytearr {
+		if byteitem == byte(0xAC) { //STREND / INTEND
+			break
+		} 
+		bin := fmt.Sprintf("%08s", IntToBin(int(byteitem)))
+		tensplace := BinToInt(bin[:4])
+		fmt.Fprint(&stringtopush, tensplace)
+		onesplace := BinToInt(bin[4:])
+		fmt.Fprint(&stringtopush, onesplace)
+		if tensplace > 9 {
+			log.Fatal("PANIC: INVALID INT [PUSHINT <INVALID INT>] <GMC> InvalidInt: " + fmt.Sprint(tensplace))
+		}
+		if onesplace > 9 {
+			log.Fatal("PANIC: INVALID INT [PUSHINT <INVALID INT>] <GMC> InvalidInt: " + fmt.Sprint(tensplace))
+		}
+	}
+	i, err := strconv.Atoi(stringtopush.String())
+	if err != nil {
+		log.Fatal(err)
+	}
+	return i 
 }

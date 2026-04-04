@@ -3,8 +3,6 @@ package main
 import (
 	"fmt"
 	"log"
-	"strconv"
-	"strings"
 )
 var OPTION_AUTOCLEAR_ARG = false
 var STACK_ARG []any
@@ -60,27 +58,7 @@ func CommandPushInt(instruction []byte) {
 	if stack > 1 {
 		log.Fatal("PANIC: INVALID INSTRUCTION [PUSHINT <TO_BIG> ...] <GMC> InvalidStack: " + fmt.Sprint(stack))
 	}
-	var stringtopush strings.Builder
-	for _, byteitem := range instruction[2:] {
-		if byteitem == byte(0xAC) { //STREND / INTEND
-			break
-		}
-		bin := fmt.Sprintf("%08s", IntToBin(int(byteitem)))
-		tensplace := BinToInt(bin[:4])
-		fmt.Fprint(&stringtopush, tensplace)
-		onesplace := BinToInt(bin[4:])
-		fmt.Fprint(&stringtopush, onesplace)
-		if tensplace > 9 {
-			log.Fatal("PANIC: INVALID INT [PUSHINT <INVALID INT>] <GMC> InvalidInt: " + fmt.Sprint(tensplace))
-		}
-		if onesplace > 9 {
-			log.Fatal("PANIC: INVALID INT [PUSHINT <INVALID INT>] <GMC> InvalidInt: " + fmt.Sprint(tensplace))
-		}
-	}
-	i, err := strconv.Atoi(stringtopush.String())
-	if err != nil {
-		log.Fatal(err)
-	}	
+	i := ParseInt(instruction[2:])
 	if instruction[1] == 0 {
 		STACK_ARG = append(STACK_ARG, i)
 	} else {
@@ -97,7 +75,7 @@ func CommandPushVar(instruction []byte) {
 	stack := int(instruction[1])
 	key := string(instruction[2:])
 	value, ok := VARS[key]
-	if !ok {
+	if !ok || value == nil{
 		log.Fatal("PANIC: INVALID INSTRUCTION [PUSHVAR STACK <VAR-DOES-NOT-EXIST>]")
 	}
 	if stack == 0 {
