@@ -28,21 +28,11 @@ func CommandPushStr(instruction []byte) {
 	if stack > 1 {
 		log.Fatal("PANIC: INVALID INSTRUCTION [PUSHSTR <TO_BIG> ...] <GMC> InvalidStack: " + fmt.Sprint(stack))
 	}
-	var stringtopush strings.Builder
-	for _, byteitem := range instruction[2:] {
-		convint := int(byteitem)
-		if convint == 0xAC {
-			break
-		}
-		if convint > len(DECODER)-1 {
-			log.Fatal("PANIC: INVALID STRING [PUSHSTR STACK <INVALID STRING>] <GMC> InvalidChar: " + fmt.Sprint(int(byteitem)))
-		}
-		stringtopush.WriteString(string(DECODER[convint]))
-	}
+	str := ParseString(instruction[2:])
 	if stack == 0 {
-		STACK_ARG = append(STACK_ARG, stringtopush.String())
+		STACK_ARG = append(STACK_ARG, str)
 	} else {
-		STACK_PERSONAL = append(STACK_PERSONAL, stringtopush.String())
+		STACK_PERSONAL = append(STACK_PERSONAL, str)
 	}
 }
 func CommandClearStack(instruction []byte) {
@@ -75,7 +65,7 @@ func CommandPushInt(instruction []byte) {
 		if byteitem == byte(0xAC) { //STREND / INTEND
 			break
 		}
-		bin := fmt.Sprintf("%08s", intToBin(int(byteitem)))
+		bin := fmt.Sprintf("%08s", IntToBin(int(byteitem)))
 		tensplace := BinToInt(bin[:4])
 		fmt.Fprint(&stringtopush, tensplace)
 		onesplace := BinToInt(bin[4:])

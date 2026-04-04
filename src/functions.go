@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"os/exec"
@@ -8,7 +9,6 @@ import (
 
 	"github.com/fatih/color"
 )
-
 func FuncColorPrint() {
 	pcolor := ReadStackArg(0).(int)
 	stringtoprint := ReadStackArg(1).(string) // what
@@ -24,7 +24,7 @@ func FuncColorPrint() {
 	case 0x04:
 		color.Cyan(stringtoprint)
 	default:
-		log.Fatal("PANIC: INVALID STACK [CALL COLORPRINT] [STACK ARG]<GMC> InvalidColor: " + string(pcolor))
+		log.Fatal("PANIC: INVALID STACK [CALL COLORPRINT] [STACK ARG]<GMC> InvalidColor: " + fmt.Sprint(pcolor))
 	}
 
 }

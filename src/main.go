@@ -4,22 +4,8 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strconv"
 )
 
-
-var DECODER string = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!?.()[]{}_&%$'\"/\\@<>|+-*~#= \n\t" // add nmore charaters
-
-func intToBin(int_ int) string {
-	return strconv.FormatInt(int64(int_), 2)
-}
-func BinToInt(bin string) int64 {
-	val, err := strconv.ParseInt(bin, 2, 0)
-	if err != nil {
-		log.Fatal(err)
-	}
-	return val
-}
 func GetInstructions(path string) [][]byte {
 	bytesoriginal, err := os.ReadFile(path)
 	if err != nil {
@@ -49,7 +35,7 @@ func ReadInstruction(instruction []byte) {
 			log.Fatal("PANIC: INVALID INSTRUCTION [OPTION <MISSING>] <GMC>")
 		}
 		options := instruction[1]
-		binoptions := intToBin(int(options))
+		binoptions := IntToBin(int(options))
 		if binoptions[0] == '1' {
 			OPTION_AUTOCLEAR_ARG = true
 		} //todo: add more options
@@ -78,6 +64,8 @@ func ReadInstruction(instruction []byte) {
 		CommandClearStack(instruction)
 	case 0xB0:
 		CommandPushInt(instruction)
+	case 0xB1:
+		CommandStrVar(instruction)
 	}
 }
 
