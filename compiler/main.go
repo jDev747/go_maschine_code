@@ -85,14 +85,26 @@ func CompileInstruction(instruction string) []byte {
 		if len(split) < 2 {
 			Raise("Missing <varname>", instruction)
 		}
-		if split[1][1:3] == "A8" || split[1][2:5] == "A8" {
+		if split[1][0:2] == "A8" || split[1][2:4] == "A8" {
 			Raise("Invalid: <varname> CANNOT contain byte A8", instruction)
 		}
 		compiled = append(compiled, byte(0xB1))
-		compiled = append(compiled, byte(StrToInt(split[1], 16)))
+		compiled = append(compiled, byte(StrToInt(split[1][0:2], 16)))
+		compiled = append(compiled, byte(StrToInt(split[1][2:4], 16)))
 		if len(split) > 2 {
 			compiled = append(compiled, Encode(strings.Join(split[2:], " "))...)
 		}
+	case "pushvar":
+		if len(split) < 2 {
+			Raise("Missing <stack>", instruction)
+		}
+		if len(split) < 3 {
+			Raise("Missing <varname>", instruction)
+		}
+		compiled = append(compiled, byte(0xB2))
+		compiled = append(compiled, byte(StrToInt(split[1], 16)))
+		compiled = append(compiled, byte(StrToInt(split[2][0:2], 16)))
+		compiled = append(compiled, byte(StrToInt(split[2][2:4], 16)))
 	case "//":
 		//ignore: this will be a comment
 	}
