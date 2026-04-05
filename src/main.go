@@ -54,7 +54,7 @@ func ReadInstruction(instruction []byte) {
 	case 0xB3:
 		CommandIntVar(instruction)
 	case 0xB4:
-		//Here READSTACK will be
+		CommandReadStack(instruction)
 	default:
 		log.Fatal("PANIC: INVALID INSTRUCTION <GMC> InvalidInstruction: " + fmt.Sprint(itype))
 	}

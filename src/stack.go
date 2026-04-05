@@ -76,11 +76,30 @@ func CommandPushVar(instruction []byte) {
 	key := string(instruction[2:])
 	value, ok := VARS[key]
 	if !ok || value == nil{
-		log.Fatal("PANIC: INVALID INSTRUCTION [PUSHVAR STACK <VAR-DOES-NOT-EXIST>]")
+		log.Fatal("PANIC: INVALID INSTRUCTION [PUSHVAR STACK <VAR-DOES-NOT-EXIST>] InvalidVar: ", fmt.Sprint(key))
 	}
 	if stack == 0 {
 		STACK_ARG = append(STACK_ARG, value)
 	} else {
 		STACK_RETURN = append(STACK_RETURN, value)
+	}
+}
+func CommandReadStack(instruction []byte) {
+	if len(instruction) < 2 {
+		log.Fatal("PANIC: INVALID INSTRUCTION [READSTACK <MISSING> ...] <GMC> MissingStack")
+	}
+	if len(instruction) < 4 {
+		log.Fatal("PANIC: INVALID INSTRUCTION [READSTACK STACK <MISSING>] <GMC> MissingVar")
+	}
+	stack := int(instruction[1])
+	key := string(instruction[2:4])
+	switch stack {
+	case 0:
+		VARS[key] = ReadStackArg(0)
+	case 1:
+		if len(STACK_RETURN) < 1 {
+			log.Fatal("PANIC: INVALID STACK [STACK RETURN] <GMC> MissingParamInStack")
+		}
+		VARS[key] = STACK_RETURN[0]
 	}
 }
