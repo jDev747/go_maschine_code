@@ -21,7 +21,8 @@ func Raise(msg string, i string) {
 }
 func Encode(msg string) []byte {
 	list := make([]byte, 0, len(msg))
-	for _, char := range msg {
+	msg_ := strings.ReplaceAll(msg, "\\n","\n")
+	for _, char := range msg_ {
 		if val, ok := encoderMap[char]; ok {
 			list = append(list, val)
 		} else {

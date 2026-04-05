@@ -28,7 +28,7 @@ func ReadInstruction(instruction []byte) {
 	}
 	switch itype {
 	case 0xA9:
-		fmt.Println("exit code 0")
+		fmt.Println("exit status 0")
 		os.Exit(0)
 	case 0xAA:
 		if len(instruction) < 2 {

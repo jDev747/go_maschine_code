@@ -17,7 +17,7 @@ func CommandCall(instruction []byte) {
 	function := int(instruction[1])
 	switch function {
 	case 0x00:
-		fmt.Println(ReadStackArg(0))
+		fmt.Print(ReadStackArg(0))
 	case 0x01:
 		FuncClearScreen()
 	case 0x02:
@@ -35,7 +35,6 @@ func CommandCall(instruction []byte) {
 	}
 	if OPTION_AUTOCLEAR_ARG {
 		STACK_ARG = make([]any, 0, 6)
-		fmt.Println(STACK_ARG...)
 	}
 }
 func FuncOpAll(op string) float64 {
@@ -83,15 +82,15 @@ func FuncColorPrint() {
 	stringtoprint := ReadStackArg(1).(string) // what
 	switch pcolor {
 	case 0x00:
-		color.Red(stringtoprint)
+		color.New(color.FgRed).Print(stringtoprint)
 	case 0x01:
-		color.Blue(stringtoprint)
+		color.New(color.FgBlue).Print(stringtoprint)
 	case 0x02:
-		color.Yellow(stringtoprint)
+		color.New(color.FgYellow).Print(stringtoprint)
 	case 0x03:
-		color.White(stringtoprint)
+		color.New(color.FgWhite).Print(stringtoprint)
 	case 0x04:
-		color.Cyan(stringtoprint)
+		color.New(color.FgCyan).Print(stringtoprint)
 	default:
 		log.Fatal("PANIC: INVALID STACK [CALL COLORPRINT] [STACK ARG]<GMC> InvalidColor: " + fmt.Sprint(pcolor))
 	}
