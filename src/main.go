@@ -53,13 +53,13 @@ func ReadInstruction(instruction []byte) {
 			FuncClearScreen()
 		case 0x02:
 			FuncColorPrint()
-
 		default:
 			log.Fatal("PANIC: INVALID INSTRUCTION [CALL <NOT_FOUND>] <GMC> InvalidFunction: " + fmt.Sprint(function))
-			if OPTION_AUTOCLEAR_ARG {
-				STACK_ARG = make([]any, 0, 6)
-			}
 		}
+		if OPTION_AUTOCLEAR_ARG {
+			STACK_ARG = make([]any, 0, 6)
+			fmt.Println(STACK_ARG...)
+			}
 	case 0xAF:
 		CommandClearStack(instruction)
 	case 0xB0:

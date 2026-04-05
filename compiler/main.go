@@ -7,6 +7,14 @@ import (
 )
 
 var DECODER string = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!?.()[]{}_&%$'\"/\\@<>|+-*~#= \n\t"
+var encoderMap map[rune]byte
+
+func init() {
+	encoderMap = make(map[rune]byte)
+	for i, char := range DECODER {
+		encoderMap[char] = byte(i)
+	}
+}
 
 func Raise(msg string, i string) {
 	log.Fatalf("Compilation error: %s \nInstruction: %s", msg, i)
@@ -14,10 +22,10 @@ func Raise(msg string, i string) {
 func Encode(msg string) []byte {
 	list := make([]byte, 0, len(msg))
 	for _, char := range msg {
-		for i, thing := range DECODER {
-			if thing == char {
-				list = append(list, byte(i))
-			}
+		if val, ok := encoderMap[char]; ok {
+			list = append(list, val)
+		} else {
+			Raise("Unknown character in string", string(char))
 		}
 	}
 	return list
