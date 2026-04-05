@@ -6,7 +6,7 @@ import (
 )
 var OPTION_AUTOCLEAR_ARG = false
 var STACK_ARG []any
-var STACK_PERSONAL []any
+var STACK_RETURN []any
 func ReadStackArg(index int) any {
 	if len(STACK_ARG) < index+1 {
 		log.Fatal("PANIC: INVALID STACK [STACK ARG] <GMC> MissingParamInStack")
@@ -30,7 +30,7 @@ func CommandPushStr(instruction []byte) {
 	if stack == 0 {
 		STACK_ARG = append(STACK_ARG, str)
 	} else {
-		STACK_PERSONAL = append(STACK_PERSONAL, str)
+		STACK_RETURN = append(STACK_RETURN, str)
 	}
 }
 func CommandClearStack(instruction []byte) {
@@ -44,7 +44,7 @@ func CommandClearStack(instruction []byte) {
 		if stack == 0 {
 			STACK_ARG = make([]any, 0, 5)
 		} else {
-			STACK_PERSONAL = make([]any, 0, 5)
+			STACK_RETURN = make([]any, 0, 5)
 		}
 }
 func CommandPushInt(instruction []byte) {
@@ -62,7 +62,7 @@ func CommandPushInt(instruction []byte) {
 	if instruction[1] == 0 {
 		STACK_ARG = append(STACK_ARG, i)
 	} else {
-		STACK_PERSONAL = append(STACK_PERSONAL, i)
+		STACK_RETURN = append(STACK_RETURN, i)
 	}
 }
 func CommandPushVar(instruction []byte) {
@@ -81,6 +81,6 @@ func CommandPushVar(instruction []byte) {
 	if stack == 0 {
 		STACK_ARG = append(STACK_ARG, value)
 	} else {
-		STACK_PERSONAL = append(STACK_PERSONAL, value)
+		STACK_RETURN = append(STACK_RETURN, value)
 	}
 }

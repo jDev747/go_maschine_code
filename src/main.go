@@ -42,24 +42,7 @@ func ReadInstruction(instruction []byte) {
 	case 0xAB:
 		CommandPushStr(instruction)
 	case 0xAD:
-		if len(instruction) < 2 {
-			log.Fatal("PANIC: INVALID INSTRUCTION [CALL <MISSING>] <GMC> MissingFunction")
-		}
-		function := int(instruction[1])
-		switch function {
-		case 0x00:
-			fmt.Println(ReadStackArg(0))
-		case 0x01:
-			FuncClearScreen()
-		case 0x02:
-			FuncColorPrint()
-		default:
-			log.Fatal("PANIC: INVALID INSTRUCTION [CALL <NOT_FOUND>] <GMC> InvalidFunction: " + fmt.Sprint(function))
-		}
-		if OPTION_AUTOCLEAR_ARG {
-			STACK_ARG = make([]any, 0, 6)
-			fmt.Println(STACK_ARG...)
-			}
+		CommandCall(instruction)
 	case 0xAF:
 		CommandClearStack(instruction)
 	case 0xB0:
@@ -70,6 +53,8 @@ func ReadInstruction(instruction []byte) {
 		CommandPushVar(instruction)
 	case 0xB3:
 		CommandIntVar(instruction)
+	case 0xB4:
+		//Here READSTACK will be
 	default:
 		log.Fatal("PANIC: INVALID INSTRUCTION <GMC> InvalidInstruction: " + fmt.Sprint(itype))
 	}
