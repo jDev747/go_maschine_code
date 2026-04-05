@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"runtime"
+	"strconv"
 
 	"github.com/fatih/color"
 )
@@ -15,6 +16,7 @@ func CommandCall(instruction []byte) {
 		log.Fatal("PANIC: INVALID INSTRUCTION [CALL <MISSING>] <GMC> MissingFunction")
 	}
 	function := int(instruction[1])
+	// we can add functions without changed the compiler code.
 	switch function {
 	case 0x00:
 		fmt.Print(ReadStackArg(0))
@@ -30,6 +32,10 @@ func CommandCall(instruction []byte) {
 		FuncOpAll("*")
 	case 0x06:
 		FuncOpAll("/")
+	case 0x07:
+		FuncReadUserInp()
+	case 0x08:
+		FuncReadUserInpInt()
 	default:
 		log.Fatal("PANIC: INVALID INSTRUCTION [CALL <NOT_FOUND>] <GMC> InvalidFunction: " + fmt.Sprint(function))
 	}
@@ -37,7 +43,7 @@ func CommandCall(instruction []byte) {
 		STACK_ARG = make([]any, 0, 6)
 	}
 }
-func FuncOpAll(op string) float64 {
+func FuncOpAll(op string) {
 	var total float64
 	first := true
 
@@ -75,11 +81,10 @@ func FuncOpAll(op string) float64 {
 	}
 
 	STACK_RETURN = append(STACK_RETURN, total)
-	return total
 }
 func FuncColorPrint() {
 	pcolor := ReadStackArg(0).(int)
-	stringtoprint := ReadStackArg(1).(string) // what
+	stringtoprint := ReadStackArg(1).(string)
 	switch pcolor {
 	case 0x00:
 		color.New(color.FgRed).Print(stringtoprint)
@@ -92,7 +97,7 @@ func FuncColorPrint() {
 	case 0x04:
 		color.New(color.FgCyan).Print(stringtoprint)
 	default:
-		log.Fatal("PANIC: INVALID STACK [CALL COLORPRINT] [STACK ARG]<GMC> InvalidColor: " + fmt.Sprint(pcolor))
+		log.Fatal("PANIC: INVALID STACK [CALL COLORPRINT] [STACK ARG] <GMC> InvalidColor: " + fmt.Sprint(pcolor))
 	}
 
 }
@@ -107,4 +112,26 @@ func FuncClearScreen() {
 	cmd.Stdout = os.Stdout
 	cmd.Run()
 	// Does not work in vscode terminal btw
+}
+func FuncReadUserInp() {
+	var result string
+	_, err := fmt.Scanln(&result)
+	if err != nil {
+		log.Fatal(err)
+	}
+	STACK_RETURN = append(STACK_RETURN, result)
+}
+func FuncReadUserInpInt() {
+	var result string
+	var r2 int64
+	_, err := fmt.Scanln(&result)
+	if v, err2 := strconv.ParseInt(result, 10, 64); err2 == nil {
+		r2 = v
+	} else {
+		log.Fatal("PANIC: INVALID USER INPUT [CALL INPUTINT] <GMC> InvalidInt: " + result)
+	}
+	if err != nil {
+		log.Fatal(err)
+	}
+	STACK_RETURN = append(STACK_RETURN, r2)
 }
