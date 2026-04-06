@@ -37,8 +37,11 @@ func ReadInstruction(instruction []byte) {
 		options := instruction[1]
 		binoptions := IntToBin(int(options))
 		if binoptions[0] == '1' {
-			OPTION_AUTOCLEAR_ARG = true
-		} //todo: add more options
+			OPTION_AUTOCLEAR_CALL= true
+		}
+		if binoptions[1] == '1' {
+			OPTION_AUTOCLEAR_READSTACK = true
+		}
 	case 0xAB:
 		CommandPushStr(instruction)
 	case 0xAD:

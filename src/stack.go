@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"log"
 )
-var OPTION_AUTOCLEAR_ARG = false
+var OPTION_AUTOCLEAR_CALL = false
+var OPTION_AUTOCLEAR_READSTACK = false
 var STACK_ARG []any
 var STACK_RETURN []any
 func ReadStackArg(index int) any {
@@ -96,10 +97,16 @@ func CommandReadStack(instruction []byte) {
 	switch stack {
 	case 0:
 		VARS[key] = ReadStackArg(0)
+		if OPTION_AUTOCLEAR_READSTACK {
+			STACK_ARG = make([]any, 0, 5)
+		}
 	case 1:
 		if len(STACK_RETURN) < 1 {
 			log.Fatal("PANIC: INVALID STACK [STACK RETURN] <GMC> MissingParamInStack")
 		}
 		VARS[key] = STACK_RETURN[0]
 	}
+		if OPTION_AUTOCLEAR_READSTACK {
+			STACK_RETURN = make([]any, 0, 5)
+		}
 }

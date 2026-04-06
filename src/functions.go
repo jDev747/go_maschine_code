@@ -19,7 +19,9 @@ func CommandCall(instruction []byte) {
 	// we can add functions without changed the compiler code.
 	switch function {
 	case 0x00:
-		fmt.Print(ReadStackArg(0))
+		for _, i := range STACK_ARG {
+			fmt.Print(i)
+		}
 	case 0x01:
 		FuncClearScreen()
 	case 0x02:
@@ -39,7 +41,7 @@ func CommandCall(instruction []byte) {
 	default:
 		log.Fatal("PANIC: INVALID INSTRUCTION [CALL <NOT_FOUND>] <GMC> InvalidFunction: " + fmt.Sprint(function))
 	}
-	if OPTION_AUTOCLEAR_ARG {
+	if OPTION_AUTOCLEAR_CALL {
 		STACK_ARG = make([]any, 0, 6)
 	}
 }
