@@ -58,8 +58,10 @@ func FuncOpAll(op string) {
 			v = x
 		case int:
 			v = float64(x)
+		case int64:
+			v = float64(x)
 		default:
-			log.Fatal("PANIC: INVALID STACK [CALL ADDALL] [NON-NUMERIC STACK!] <GMC> InvalidStackVal: " + fmt.Sprint(num))
+			log.Fatal("PANIC: INVALID STACK [CALL MATH] [NON-NUMERIC STACK!] <GMC> InvalidStackVal: " + fmt.Sprint(num))
 		}
 
 		if first {
@@ -78,7 +80,7 @@ func FuncOpAll(op string) {
 		case "/":
 			total /= v
 		default:
-			log.Fatal("PANIC: INVALID OPERATION [CALL ADDALL] <GMC> InvalidOp: " + op)
+			log.Fatal("PANIC: INVALID OPERATION [CALL MATH] <GMC> InvalidOp: " + op)
 		}
 	}
 

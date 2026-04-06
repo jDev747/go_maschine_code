@@ -54,7 +54,7 @@ func CompileInstruction(instruction string) []byte {
 		if len(split) < 2 {
 			Raise("Missing <option>", instruction)
 		}
-		i := StrToInt(split[1], 16)
+		i := StrToInt(split[1], 2) // use binary
 		compiled = append(compiled, byte(0xAA), byte(i))
 	case "pushstr":
 		if len(split) < 2 {
